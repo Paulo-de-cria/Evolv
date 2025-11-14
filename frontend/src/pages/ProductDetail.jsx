@@ -25,7 +25,13 @@ const ProductDetail = () => {
     try {
       setLoading(true)
       const response = await productService.getById(id)
-      setProduct(response.data.product)
+      // Corrigir estrutura de resposta: backend retorna { status, data: { product } }
+      const productData = response.data?.data?.product || response.data?.product
+      if (productData) {
+        setProduct(productData)
+      } else {
+        throw new Error('Produto não encontrado')
+      }
     } catch (error) {
       console.error('Erro ao carregar produto:', error)
       navigate('/products')
@@ -116,7 +122,7 @@ const ProductDetail = () => {
               <span className="text-3xl font-bold text-evolv-primary">
                 {formatPrice(product.price)}
               </span>
-              {product.stock_quantity > 0 ? (
+              {product.stock_quantity !== undefined && product.stock_quantity > 0 ? (
                 <span className="ml-4 text-green-600 font-medium">
                   ✓ Em estoque
                 </span>
@@ -157,7 +163,7 @@ const ProductDetail = () => {
             <div className="flex flex-col sm:flex-row gap-4 mb-6">
               <button
                 onClick={handleAddToCart}
-                disabled={addingToCart || product.stock_quantity === 0}
+                disabled={addingToCart || (product.stock_quantity !== undefined && product.stock_quantity === 0)}
                 className="btn-primary flex-1 flex items-center justify-center"
               >
                 {addingToCart ? (

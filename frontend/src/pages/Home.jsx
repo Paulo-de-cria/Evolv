@@ -12,9 +12,12 @@ const Home = () => {
     const loadFeaturedProducts = async () => {
       try {
         const response = await productService.getAll({ limit: 8 })
-        setFeaturedProducts(response.data.products)
+        // Corrigir estrutura de resposta: backend retorna { status, data: { products } }
+        const products = response.data?.data?.products || response.data?.products || []
+        setFeaturedProducts(products)
       } catch (error) {
         console.error('Erro ao carregar produtos:', error)
+        setFeaturedProducts([]) // Garantir que não seja undefined
       } finally {
         setLoading(false)
       }

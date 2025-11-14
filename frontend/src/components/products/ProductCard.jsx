@@ -54,14 +54,16 @@ const ProductCard = ({ product }) => {
           </p>
 
           {/* Rating */}
-          <div className="flex items-center mb-3">
-            <div className="flex text-yellow-400">
-              {'★'.repeat(5)}
+          {product.rating !== undefined && (
+            <div className="flex items-center mb-3">
+              <div className="flex text-yellow-400">
+                {'★'.repeat(Math.floor(product.rating || 0))}
+              </div>
+              <span className="text-gray-500 text-sm ml-1">
+                ({product.review_count || 0})
+              </span>
             </div>
-            <span className="text-gray-500 text-sm ml-1">
-              ({product.review_count || 0})
-            </span>
-          </div>
+          )}
 
           {/* Preço e Ação */}
           <div className="flex items-center justify-between">
@@ -73,9 +75,9 @@ const ProductCard = ({ product }) => {
             
             <button
               onClick={handleAddToCart}
-              disabled={addingToCart || product.stock_quantity === 0}
+              disabled={addingToCart || (product.stock_quantity !== undefined && product.stock_quantity === 0)}
               className="bg-evolv-primary hover:bg-evolv-secondary text-white p-2 rounded-lg transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
-              title={product.stock_quantity === 0 ? 'Produto esgotado' : 'Adicionar ao carrinho'}
+              title={(product.stock_quantity !== undefined && product.stock_quantity === 0) ? 'Produto esgotado' : 'Adicionar ao carrinho'}
             >
               {addingToCart ? (
                 <LoadingSpinner size="small" text="" />

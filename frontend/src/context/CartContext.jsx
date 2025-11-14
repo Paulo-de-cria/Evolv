@@ -19,9 +19,12 @@ export const CartProvider = ({ children }) => {
     try {
       setLoading(true)
       const response = await cartService.getCart()
-      setCart(response.data.items || [])
+      // Corrigir estrutura de resposta: backend retorna { status, data: { items } }
+      const items = response.data?.data?.items || response.data?.items || []
+      setCart(items)
     } catch (error) {
       console.error('Erro ao carregar carrinho:', error)
+      setCart([]) // Garantir que não seja undefined
     } finally {
       setLoading(false)
     }
@@ -80,17 +83,28 @@ export const CartProvider = ({ children }) => {
   }
 
   const getCartTotal = () => {
+    if (!cart || cart.length === 0) return 0
     return cart.reduce((total, item) => {
-      return total + (item.products.price * item.quantity)
+      const price = item?.products?.price || item?.price || 0
+      const quantity = item?.quantity || 0
+      return total + (price * quantity)
     }, 0)
   }
 
   const getCartItemCount = () => {
-    return cart.reduce((count, item) => count + item.quantity, 0)
+    if (!cart || cart.length === 0) return 0
+    return cart.reduce((count, item) => count + (item?.quantity || 0), 0)
   }
 
   useEffect(() => {
-    loadCart()
+    // Só carregar carrinho se houver token (usuário autenticado)
+    const token = localStorage.getItem('evolv_token')
+    if (token) {
+      loadCart()
+    } else {
+      setCart([])
+      setLoading(false)
+    }
   }, [])
 
   const value = {

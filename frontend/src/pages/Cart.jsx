@@ -47,7 +47,7 @@ const Cart = () => {
       <div className="fade-in">
         <h1 className="text-3xl font-bold text-gray-900 mb-8">Meu Carrinho</h1>
 
-        {cart.length === 0 ? (
+        {!cart || cart.length === 0 ? (
           <div className="bg-white rounded-lg shadow-card p-12 text-center">
             <div className="text-6xl mb-4">🛒</div>
             <h2 className="text-2xl font-bold text-gray-900 mb-4">
@@ -80,9 +80,15 @@ const Cart = () => {
                 </div>
 
                 <div className="divide-y">
-                  {cart.map(item => (
-                    <CartItem key={item.id} item={item} />
-                  ))}
+                  {cart && cart.length > 0 ? (
+                    cart.map(item => (
+                      <CartItem key={item.id} item={item} />
+                    ))
+                  ) : (
+                    <div className="p-6 text-center text-gray-500">
+                      Nenhum item no carrinho
+                    </div>
+                  )}
                 </div>
               </div>
             </div>

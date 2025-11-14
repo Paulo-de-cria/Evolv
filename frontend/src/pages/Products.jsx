@@ -42,7 +42,9 @@ const Products = () => {
       })
 
       const response = await productService.getAll(params)
-      setProducts(response.data.products)
+      // Corrigir estrutura de resposta: backend retorna { status, data: { products } }
+      const products = response.data?.data?.products || response.data?.products || []
+      setProducts(products)
     } catch (error) {
       console.error('Erro ao carregar produtos:', error)
     } finally {
@@ -53,9 +55,12 @@ const Products = () => {
   const loadCategories = async () => {
     try {
       const response = await productService.getCategories()
-      setCategories(response.data.categories)
+      // Corrigir estrutura de resposta: backend retorna { status, data: { categories } }
+      const categoriesData = response.data?.data?.categories || response.data?.categories || []
+      setCategories(categoriesData)
     } catch (error) {
       console.error('Erro ao carregar categorias:', error)
+      setCategories([]) // Garantir que não seja undefined
     }
   }
 
@@ -122,7 +127,7 @@ const Products = () => {
                 className="form-input"
               >
                 <option value="">Todas</option>
-                {categories.map(category => (
+                {categories && categories.length > 0 && categories.map(category => (
                   <option key={category} value={category}>
                     {category}
                   </option>
@@ -192,7 +197,7 @@ const Products = () => {
             <div className="flex justify-center py-12">
               <LoadingSpinner />
             </div>
-          ) : products.length > 0 ? (
+          ) : products && products.length > 0 ? (
             <>
               <div className="mb-4 text-gray-600">
                 {products.length} produto(s) encontrado(s)
